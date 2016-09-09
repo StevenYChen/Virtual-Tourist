@@ -71,9 +71,11 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     // Mark: Flickr
     func flickrRequest(){
-        FlickrClient.sharedInstance().getFlickrPhotoAlbum(pin!) {(photosArray, errorString) in
+        FlickrClient.sharedInstance().getFlickrPhotoAlbumPages(pin!) {(pages, errorString) in
+            print(pages)
             
-            if photosArray != nil {
+        }
+           /* if photosArray != nil {
                 for photoArray in photosArray!{
                     let id = photoArray["id"] as? String
                     let title = photoArray["title"] as? String
@@ -110,7 +112,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
                 print("finished request")
                 self.photos = self.pin?.photos
             }
-        }
+        }*/
     }
     
     // Mark: Fetch Results
