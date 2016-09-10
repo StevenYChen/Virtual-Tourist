@@ -14,11 +14,11 @@ class FlickrClient : NSObject {
 
     let APIBaseURL = "https://api.flickr.com/services/rest/"
 
-    func getFlickrPhotoAlbum(pin: Pin, page:UInt32, completionHandler: (photosArray:[[String:AnyObject]]?, pages:Int?, error: String?) -> Void) {
+    func getFlickrPhotoAlbum(pin: Pin, page:UInt32, completionHandler: (photosArray:[[String:AnyObject]]?, maxPages:Int?, error: String?) -> Void) {
         
         let longitude = -pin.longitude
         let random = Int( arc4random_uniform(page+1) )
-        print(random)
+
         let methodParameters: [String: AnyObject] = [
             "method":           "flickr.photos.search",
             "api_key":          "8bd47512e75c46ff25915f98448956a8",
@@ -47,7 +47,7 @@ class FlickrClient : NSObject {
             func displayError(error: String) {
                 print(error)
                 print("URL at time of error: \(url)")
-                completionHandler(photosArray: nil, pages: 0, error: error)
+                completionHandler(photosArray: nil, maxPages: 0, error: error)
                 return
             }
             
