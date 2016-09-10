@@ -23,7 +23,6 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     }()
     
     @IBOutlet weak var collectionView: UICollectionView!
-    
     @IBOutlet weak var mapView: MKMapView!
     
     override func viewDidLoad() {
@@ -41,7 +40,6 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         photos = fetched.fetchedObjects as? [Photo]
         if photos?.count != 0 {
             loadFromDisk = true
-            print(photos?.count)
         } else {
             flickrRequest()
             loadFromDisk = false
@@ -71,48 +69,40 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     // Mark: Flickr
     func flickrRequest(){
-        FlickrClient.sharedInstance().getFlickrPhotoAlbumPages(pin!, page: 1) {(photosArray, pages, errorString) in
-            print(pages)
-            
-        }
-           /* if photosArray != nil {
-                for photoArray in photosArray!{
-                    let id = photoArray["id"] as? String
-                    let title = photoArray["title"] as? String
-                    var image:UIImage?
-                    var imagePath:NSURL?
-                    let imageURL = NSURL(string: photoArray["url_m"] as! String)
+        FlickrClient.sharedInstance().getFlickrPhotoAlbum(self.pin!, page: 1) {(photosArray, maxPages, errorString) in
+            if maxPages != 0{
+                FlickrClient.sharedInstance().getFlickrPhotoAlbum(self.pin!, page:UInt32(maxPages!)) {(photosArray, maxPages, errorString) in
                     
-                    if let imageData = NSData(contentsOfURL: imageURL!) {
-                        performUIUpdatesOnMain {
+                    if photosArray != nil {
+                        for photoArray in photosArray!{
+                            let id = photoArray["id"] as? String
+                            let title = photoArray["title"] as? String
+                            let imageURL = NSURL(string: photoArray["url_m"] as! String)
                             
-                            image = UIImage(data: imageData)
-                            let documentsPath = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first
-                            
-                            imagePath = documentsPath!.URLByAppendingPathComponent("\(id!).jpg")
-                           // self.testImage.image = image
-                            UIImageJPEGRepresentation(image!, 1.0)!.writeToFile(imagePath!.path!, atomically: true)
-                            
-                            let photo = Photo(id: id!, title: title!, imagePath: imagePath!.path!, context: self.sharedContext)
-                            //  print(photo.imagePath)
-                            
-                            photo.pin = self.pin
-                            self.photos?.append(photo)
-                            self.collectionView.reloadData()
-
-                            do {
-                                try self.sharedContext.save()
-                            } catch {
-                                print("save to core data failed")
+                            if let imageData = NSData(contentsOfURL: imageURL!) {
+                                performUIUpdatesOnMain {
+                                    
+                                    
+                                    let photo = Photo(id: id!, title: title!, image: imageData, context: self.sharedContext)
+                                    
+                                    photo.pin = self.pin
+                                    self.photos?.append(photo)
+                                    self.collectionView.reloadData()
+                                    
+                                    do {
+                                        try self.sharedContext.save()
+                                    } catch {
+                                        print("save to core data failed")
+                                    }
+                                }
+                                
                             }
                         }
                     }
-                  
                 }
-                print("finished request")
-                self.photos = self.pin?.photos
             }
-        }*/
+        }
+        self.photos = self.pin?.photos
     }
     
     // Mark: Fetch Results
@@ -145,16 +135,13 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("photoCell", forIndexPath: indexPath) as! photoCollectionViewCell
         
         let photo = photos![indexPath.row]
-        
-        let documentsPath = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first
-        let imagePath = documentsPath!.URLByAppendingPathComponent("\(photo.id!).jpg")
-        
-        if let image = UIImage(contentsOfFile: imagePath.path!){
+ 
+        if let image = UIImage(data: photo.image!){
+            cell.imageView.contentMode = UIViewContentMode.ScaleAspectFill
             cell.imageView.image = image
         }else{
-            print("getImage() [Warning: file exists at \(imagePath) :: Unable to create image]")
+            print(" Unable to create image]")
         }
-        
         return cell
     }
 }

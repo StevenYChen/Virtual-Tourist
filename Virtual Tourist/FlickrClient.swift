@@ -81,9 +81,9 @@ class FlickrClient : NSObject {
                     }
                     
                     if photosDictionary.count == 0{
-                        completionHandler(photosArray: nil, pages:nil, error: "No Photos Found")
+                        completionHandler(photosArray: nil, maxPages:0, error: "No Photos Found")
                     } else{
-                        completionHandler(photosArray: photosArray, pages:pages, error: nil)
+                        completionHandler(photosArray: photosArray, maxPages:pages, error: nil)
                     }
 
                 }
