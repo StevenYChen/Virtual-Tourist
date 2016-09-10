@@ -58,7 +58,6 @@ class TravelLocationMapView: UIViewController, MKMapViewDelegate {
             let coordinates = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
             let annotation = MKPointAnnotation()
             annotation.coordinate = coordinates
-            
 
             let longitude = coordinates.longitude as Double
             let latitude = coordinates.latitude as Double

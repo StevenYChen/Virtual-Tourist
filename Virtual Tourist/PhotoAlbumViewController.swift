@@ -71,7 +71,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     // Mark: Flickr
     func flickrRequest(){
-        FlickrClient.sharedInstance().getFlickrPhotoAlbumPages(pin!) {(pages, errorString) in
+        FlickrClient.sharedInstance().getFlickrPhotoAlbumPages(pin!, page: 1) {(photosArray, pages, errorString) in
             print(pages)
             
         }

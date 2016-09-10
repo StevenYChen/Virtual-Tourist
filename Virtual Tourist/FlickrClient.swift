@@ -14,10 +14,11 @@ class FlickrClient : NSObject {
 
     let APIBaseURL = "https://api.flickr.com/services/rest/"
 
-    func getFlickrPhotoAlbumPages(pin: Pin, completionHandler: (pages:Int?, error: String?) -> Void) {
+    func getFlickrPhotoAlbum(pin: Pin, page:UInt32, completionHandler: (photosArray:[[String:AnyObject]]?, pages:Int?, error: String?) -> Void) {
         
         let longitude = -pin.longitude
-        
+        let random = Int( arc4random_uniform(page+1) )
+        print(random)
         let methodParameters: [String: AnyObject] = [
             "method":           "flickr.photos.search",
             "api_key":          "8bd47512e75c46ff25915f98448956a8",
@@ -27,8 +28,9 @@ class FlickrClient : NSObject {
             "accuracy":          6,
             "nojsoncallback":   1,
             "safe_search":      1,
-            "extras":            "url_m"
-            //    "page":             pageRandom()
+            "extras":            "url_m",
+            "per_page":         100,
+            "page":             random
         ]
         
         let session = NSURLSession.sharedSession()
@@ -45,7 +47,7 @@ class FlickrClient : NSObject {
             func displayError(error: String) {
                 print(error)
                 print("URL at time of error: \(url)")
-                completionHandler(pages: 0, error: error)
+                completionHandler(photosArray: nil, pages: 0, error: error)
                 return
             }
             
@@ -72,14 +74,25 @@ class FlickrClient : NSObject {
                         print("error parsing photoArray")
                         return
                     }
-                    completionHandler(pages: pages, error: nil)
+                    
+                    guard let photosArray = photosDictionary["photo"] as? [[String:AnyObject]] else{
+                        print("error parsing photoArray")
+                        return
+                    }
+                    
+                    if photosDictionary.count == 0{
+                        completionHandler(photosArray: nil, pages:nil, error: "No Photos Found")
+                    } else{
+                        completionHandler(photosArray: photosArray, pages:pages, error: nil)
+                    }
+
                 }
             }
         }
         task.resume()
     }
 
-    func getFlickrPhotoAlbum(pin: Pin, completionHandler: (photosArray:[[String:AnyObject]]?, error: String?) -> Void) {
+  /*  func getFlickrPhotoAlbum(pin: Pin, completionHandler: (photosArray:[[String:AnyObject]]?, error: String?) -> Void) {
         
         let longitude = -pin.longitude
         
@@ -148,7 +161,7 @@ class FlickrClient : NSObject {
         }
         task.resume()
     }
-    
+    */
     
     private func escapedParameters(parameters: [String: AnyObject]) -> String{ // input named parameter of type dictionary, returns type string
         
