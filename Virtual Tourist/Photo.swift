@@ -17,19 +17,20 @@ class Photo: NSManagedObject{
     @NSManaged var id: String?
     @NSManaged var title: String?
     @NSManaged var image:NSData?
+    @NSManaged var imageURL:String?
     @NSManaged var pin:Pin?
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
     
-    init(id:String, title:String, image:NSData, context:NSManagedObjectContext){
+    init(id:String, title:String, imageURL:String, context:NSManagedObjectContext){
         if let entity =  NSEntityDescription.entityForName("Photo", inManagedObjectContext: context){
             super.init(entity: entity, insertIntoManagedObjectContext: context)
             
             self.id = id
             self.title = title
-            self.image = image
+            self.imageURL = imageURL
         }else{
             fatalError("Unable to find Entity name!")
         }

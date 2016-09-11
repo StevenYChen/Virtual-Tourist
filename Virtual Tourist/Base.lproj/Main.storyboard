@@ -54,6 +54,16 @@
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="pQx-Vx-uFy">
                                 <rect key="frame" x="0.0" y="64" width="600" height="149"/>
                             </mapView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tnw-B2-W0k">
+                                <rect key="frame" x="0.0" y="570" width="600" height="30"/>
+                                <color key="backgroundColor" red="0.81960784310000001" green="0.81960784310000001" blue="0.81960784310000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="New Collection">
+                                    <color key="titleShadowColor" red="0.81960784310000001" green="0.81960784310000001" blue="0.81960784310000001" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="newCollectionButton:" destination="fGh-hx-OpF" eventType="touchUpInside" id="Ro7-zl-mzu"/>
+                                </connections>
+                            </button>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="zC9-pM-irR">
                                 <rect key="frame" x="0.0" y="211" width="600" height="361"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -73,7 +83,12 @@
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="nZP-Ib-TNl">
                                                     <rect key="frame" x="0.0" y="0.0" width="136" height="134"/>
+                                                    <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 </imageView>
+                                                <activityIndicatorView opaque="NO" alpha="0.5" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="d3W-fq-D5i">
+                                                    <rect key="frame" x="51" y="47" width="37" height="37"/>
+                                                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                                </activityIndicatorView>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
@@ -82,9 +97,12 @@
                                             <constraint firstItem="nZP-Ib-TNl" firstAttribute="leading" secondItem="CXD-KZ-EWT" secondAttribute="leading" id="2yX-Dz-sRF"/>
                                             <constraint firstItem="nZP-Ib-TNl" firstAttribute="centerX" secondItem="CXD-KZ-EWT" secondAttribute="centerX" id="5fY-qK-uHw"/>
                                             <constraint firstItem="nZP-Ib-TNl" firstAttribute="centerY" secondItem="CXD-KZ-EWT" secondAttribute="centerY" id="VkB-Bb-EtS"/>
+                                            <constraint firstItem="d3W-fq-D5i" firstAttribute="centerY" secondItem="CXD-KZ-EWT" secondAttribute="centerY" id="baf-YL-jS6"/>
+                                            <constraint firstItem="d3W-fq-D5i" firstAttribute="centerX" secondItem="CXD-KZ-EWT" secondAttribute="centerX" id="hXS-bi-kDy"/>
                                             <constraint firstItem="nZP-Ib-TNl" firstAttribute="top" secondItem="CXD-KZ-EWT" secondAttribute="top" id="mvo-ld-LGj"/>
                                         </constraints>
                                         <connections>
+                                            <outlet property="activityIndicator" destination="d3W-fq-D5i" id="yrd-kK-Idc"/>
                                             <outlet property="imageView" destination="nZP-Ib-TNl" id="aMU-c2-HZ8"/>
                                         </connections>
                                     </collectionViewCell>
@@ -94,16 +112,6 @@
                                     <outlet property="delegate" destination="fGh-hx-OpF" id="Lxr-9E-zym"/>
                                 </connections>
                             </collectionView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tnw-B2-W0k">
-                                <rect key="frame" x="0.0" y="570" width="600" height="30"/>
-                                <color key="backgroundColor" red="0.81960784310000001" green="0.81960784310000001" blue="0.81960784310000001" alpha="1" colorSpace="calibratedRGB"/>
-                                <state key="normal" title="New Collection">
-                                    <color key="titleShadowColor" red="0.81960784310000001" green="0.81960784310000001" blue="0.81960784310000001" alpha="1" colorSpace="calibratedRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="newCollectionButton:" destination="fGh-hx-OpF" eventType="touchUpInside" id="Ro7-zl-mzu"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>

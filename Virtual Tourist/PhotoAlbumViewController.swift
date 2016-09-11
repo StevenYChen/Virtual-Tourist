@@ -15,7 +15,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     var pin:Pin?
     var photos:[Photo]?
     var loadFromDisk:Bool?
-    
+    var index = 0
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
     lazy var sharedContext: NSManagedObjectContext =  {
@@ -32,17 +32,15 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         self.collectionView.delegate = self
         collectionViewLayOut()
         mapViewSetUp()
-       print(pin?.latitude, pin?.longitude)
-       let fetched = fetchedResultsController
+        let fetched = fetchedResultsController
         fetched.delegate = self
         try! fetched.performFetch()
         
         photos = fetched.fetchedObjects as? [Photo]
+        print(photos?.count)
         if photos?.count != 0 {
-            loadFromDisk = true
         } else {
             flickrRequest()
-            loadFromDisk = false
         }
     }
     
@@ -69,43 +67,37 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     // Mark: Flickr
     func flickrRequest(){
-        print(photos?.count)
-
+        
         FlickrClient.sharedInstance().getFlickrPhotoAlbum(self.pin!, page: 1) {(photosArray, maxPages, errorString) in
             if maxPages != 0{
                 FlickrClient.sharedInstance().getFlickrPhotoAlbum(self.pin!, page:UInt32(maxPages!)) {(photosArray, maxPages, errorString) in
-                
                     if photosArray != nil {
                         for photoArray in photosArray!{
                             let id = photoArray["id"] as? String
                             let title = photoArray["title"] as? String
-                            let imageURL = NSURL(string: photoArray["url_m"] as! String)
+                            let imageURL = photoArray["url_m"] as? String
                             
-                            if let imageData = NSData(contentsOfURL: imageURL!) {
-                                performUIUpdatesOnMain {
-                                    
-                                    let photo = Photo(id: id!, title: title!, image: imageData, context: self.sharedContext)
-
-                                    photo.pin = self.pin
-                                    self.photos?.append(photo)
-
-                                    self.collectionView.reloadData()
-                                    
-                                    do {
-                                        try self.sharedContext.save()
-                                    } catch {
-                                        print("save to core data failed")
-                                    }
-                                }
+                            performUIUpdatesOnMain {
+                                let photo = Photo(id: id!, title: title!, imageURL: imageURL!, context: self.sharedContext)
+                                photo.pin = self.pin
+                                self.photos?.append(photo)
                                 
+                                do {
+                                    try self.sharedContext.save()
+                                } catch {
+                                    print("save to core data failed")
+                                }
                             }
+                        }
+                        performUIUpdatesOnMain {
+                            self.collectionView.reloadData()
                         }
                     }
                 }
             }
         }
-        self.photos = self.pin?.photos
     }
+  
     
     // Mark: Fetch Results
     lazy var fetchedResultsController: NSFetchedResultsController = {
@@ -127,24 +119,48 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     // MARK: Collection View Delegate
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-       // print(pin?.photos[0].imagePath)
-        
-        return (pin?.photos.count)!
+        print(self.photos?.count)
+     //   return 20
+        return  self.photos!.count
+
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("photoCell", forIndexPath: indexPath) as! photoCollectionViewCell
+        cell.imageView.image = nil
+        performUIUpdatesOnMain {
+            cell.activityIndicator.startAnimating()
+        }
         
         let photo = photos![indexPath.row]
- 
-        if let image = UIImage(data: photo.image!){
-            cell.imageView.contentMode = UIViewContentMode.ScaleAspectFill
-            cell.imageView.image = image
+        if photo.image != nil{
+            if let imageData = photo.image{
+                
+                self.loadCellImage(imageData, cell: cell)
+            }else{
+                print("error loading image")
+            }
         }else{
-            print(" Unable to create image]")
+            FlickrClient.sharedInstance().downloadImage(photo.imageURL!){(sucess, imageData, errorString) in
+                if sucess{
+                    self.loadCellImage(imageData, cell: cell)
+                    photo.image?.setValue(imageData, forKey: "imageData")
+                }
+            }
+            
         }
         return cell
+    }
+    
+    
+    func loadCellImage(imageData:NSData, cell:photoCollectionViewCell){
+        performUIUpdatesOnMain {
+        let image = UIImage(data: imageData)
+        cell.imageView.contentMode = UIViewContentMode.ScaleAspectFill
+        cell.imageView.image = image
+            cell.activityIndicator.stopAnimating()
+        }
     }
     
     // MARK: Buttons
@@ -153,16 +169,27 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         flickrRequest()
     }
     
-    func deleteData(){
-        for photo in photos! {
-            sharedContext.deleteObject(photo)
-            
+    // MARK: Save/Delete Data
+    func saveData(){
+        performUIUpdatesOnMain{
             do {
                 try self.sharedContext.save()
             } catch {
                 print("save to core data failed")
             }
         }
+    }
+    func deleteData(){
+        for photo in photos! {
+            photo.pin = nil
+            sharedContext.deleteObject(photo)
+            saveData()
+        }
+        photos?.removeAll()
+        performUIUpdatesOnMain(){
+           self.collectionView.reloadData()
+        }
+        print(photos?.count)
     }
 }
 

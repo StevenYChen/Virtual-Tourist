@@ -17,8 +17,13 @@ class FlickrClient : NSObject {
     func getFlickrPhotoAlbum(pin: Pin, page:UInt32, completionHandler: (photosArray:[[String:AnyObject]]?, maxPages:Int?, error: String?) -> Void) {
         
         let longitude = -pin.longitude
-        let random = Int( arc4random_uniform(page+1) )
+        var random:Int
+        if page > 100{
+             random = Int( arc4random_uniform(100))
+        }else{
+            random =  Int(arc4random_uniform(page-1))
 
+        }
         let methodParameters: [String: AnyObject] = [
             "method":           "flickr.photos.search",
             "api_key":          "8bd47512e75c46ff25915f98448956a8",
@@ -29,7 +34,7 @@ class FlickrClient : NSObject {
             "nojsoncallback":   1,
             "safe_search":      1,
             "extras":            "url_m",
-            "per_page":         100,
+            "per_page":         20,
             "page":             random
         ]
         
@@ -59,12 +64,11 @@ class FlickrClient : NSObject {
                 if let data = data{
                     do {
                         parsedResult = try NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments)
-                    //    print(parsedResult)
                     } catch {
                         displayError("Could not parse the data as JSON: '\(data)'")
                         return
                     }
-                    
+
                     guard let photosDictionary = parsedResult["photos"] as? [String: AnyObject] else {
                         print("photo dictionary not found")
                         return
@@ -91,7 +95,25 @@ class FlickrClient : NSObject {
         }
         task.resume()
     }
-
+    
+    func downloadImage(imagePath:String, completionHandler: (success: Bool, imageData:NSData, errorString: String?) -> Void){
+        let imgURL = NSURL(string: imagePath)
+        let request: NSURLRequest = NSURLRequest(URL: imgURL!)
+        
+        let session = NSURLSession.sharedSession()
+        let task = session.dataTaskWithRequest(request) {data, response, error in
+            
+            if error != nil {
+                completionHandler(success: false, imageData:data!, errorString: "Could not download image \(imagePath)")
+            } else {
+                completionHandler(success: true, imageData: data!, errorString: nil)
+            }
+        }
+        
+        task.resume()
+        
+    }
+    
     private func escapedParameters(parameters: [String: AnyObject]) -> String{ // input named parameter of type dictionary, returns type string
         
         if parameters.isEmpty{
