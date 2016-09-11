@@ -32,7 +32,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         self.collectionView.delegate = self
         collectionViewLayOut()
         mapViewSetUp()
-       
+       print(pin?.latitude, pin?.longitude)
        let fetched = fetchedResultsController
         fetched.delegate = self
         try! fetched.performFetch()
@@ -69,10 +69,12 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     // Mark: Flickr
     func flickrRequest(){
+        print(photos?.count)
+
         FlickrClient.sharedInstance().getFlickrPhotoAlbum(self.pin!, page: 1) {(photosArray, maxPages, errorString) in
             if maxPages != 0{
                 FlickrClient.sharedInstance().getFlickrPhotoAlbum(self.pin!, page:UInt32(maxPages!)) {(photosArray, maxPages, errorString) in
-                    
+                
                     if photosArray != nil {
                         for photoArray in photosArray!{
                             let id = photoArray["id"] as? String
@@ -82,11 +84,11 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
                             if let imageData = NSData(contentsOfURL: imageURL!) {
                                 performUIUpdatesOnMain {
                                     
-                                    
                                     let photo = Photo(id: id!, title: title!, image: imageData, context: self.sharedContext)
-                                    
+
                                     photo.pin = self.pin
                                     self.photos?.append(photo)
+
                                     self.collectionView.reloadData()
                                     
                                     do {
@@ -143,6 +145,24 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
             print(" Unable to create image]")
         }
         return cell
+    }
+    
+    // MARK: Buttons
+    @IBAction func newCollectionButton(sender: AnyObject) {
+        deleteData()
+        flickrRequest()
+    }
+    
+    func deleteData(){
+        for photo in photos! {
+            sharedContext.deleteObject(photo)
+            
+            do {
+                try self.sharedContext.save()
+            } catch {
+                print("save to core data failed")
+            }
+        }
     }
 }
 
