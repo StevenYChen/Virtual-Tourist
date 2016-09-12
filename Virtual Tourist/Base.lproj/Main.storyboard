@@ -5,7 +5,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
     </dependencies>
     <scenes>
-        <!--Virtual Tourist-->
+        <!--`-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="TravelLocationMapView" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
@@ -29,7 +29,7 @@
                             <constraint firstItem="Rbu-8W-nnK" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="xJn-bA-ABV"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Virtual Tourist" id="qxT-xh-4mv"/>
+                    <navigationItem key="navigationItem" title="`" id="qxT-xh-4mv"/>
                     <connections>
                         <outlet property="mapView" destination="Rbu-8W-nnK" id="jXt-er-dpU"/>
                         <segue destination="fGh-hx-OpF" kind="show" identifier="PhotoAlbum" id="gKf-et-FX6"/>
