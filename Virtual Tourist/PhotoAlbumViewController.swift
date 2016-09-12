@@ -37,7 +37,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         try! fetched.performFetch()
         
         photos = fetched.fetchedObjects as? [Photo]
-        print(photos?.count)
+
         if photos?.count != 0 {
         } else {
             flickrRequest()
@@ -119,10 +119,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
     
     // MARK: Collection View Delegate
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print(self.photos?.count)
-     //   return 20
         return  self.photos!.count
-
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -153,6 +150,23 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, UICollectio
         return cell
     }
     
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        let alert = UIAlertController(title: "Alert", message: "Do you want to delete this photo?", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler:  { action in
+            let photo = self.photos![indexPath.row]
+            self.sharedContext.deleteObject(photo)
+            self.saveData()
+            self.photos?.removeAtIndex(indexPath.row)
+            self.collectionView.deleteItemsAtIndexPaths([indexPath])
+
+            }))
+        alert.addAction(UIAlertAction(title: "cacel", style: UIAlertActionStyle.Default, handler: nil))
+
+        dispatch_async(dispatch_get_main_queue(), {
+            self.presentViewController(alert, animated: true, completion: nil)
+        })
+
+    }
     
     func loadCellImage(imageData:NSData, cell:photoCollectionViewCell){
         performUIUpdatesOnMain {
