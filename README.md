@@ -7,7 +7,7 @@ stored using Core Data.
 ## Installation
 
 1. Clone or download the repository to your computer.
-2. Open the project folder and open Pitch Perfect.xcodeproj using XCode
+2. Open the project folder and open Virtual Tourist.xcodeproj with XCode in Swift 2.3
 3. Run using either an iPhone device or simulator. Be sure the XCode is up to date
 
 ## Usage
